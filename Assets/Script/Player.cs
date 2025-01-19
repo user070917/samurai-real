@@ -44,9 +44,9 @@ public class Player : MonoBehaviour
         }
 
         // 공격 처리
-        if (Input.GetKey(KeyCode.Q) && jumpCount == 0) // Q가 눌려있으면 계속 공격
+        if (Input.GetKey(KeyCode.Q)) // Q가 눌려있으면 계속 공격
         {
-            if (curtime <= 0)
+            if (curtime <= 0 && isGrounded)
             {
                 ani.SetBool("Attack", true); // 공격 상태 유지
                 curtime = cooltime; // 쿨타임 갱신
