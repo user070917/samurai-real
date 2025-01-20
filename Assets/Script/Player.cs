@@ -52,7 +52,7 @@ public class Player : MonoBehaviour
                 curtime = cooltime; // 쿨타임 갱신
             }
         }
-        else if (!isGrounded && Input.GetKey(KeyCode.Q))  // air attack
+        else if (ani.GetBool("IsJumping") && ani.GetBool("Attack"))  // air attack
         {
             if (curtime <= 0)
             {
