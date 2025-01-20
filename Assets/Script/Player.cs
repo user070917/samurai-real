@@ -44,16 +44,26 @@ public class Player : MonoBehaviour
         }
 
         // 공격 처리
-        if (Input.GetKey(KeyCode.Q)) // Q가 눌려있으면 계속 공격
+        if (Input.GetKey(KeyCode.Q) && isGrounded) // Q가 눌려있으면 계속 공격
         {
-            if (curtime <= 0 && isGrounded)
+            if (curtime <= 0)
             {
                 ani.SetBool("Attack", true); // 공격 상태 유지
                 curtime = cooltime; // 쿨타임 갱신
             }
         }
+        else if (!isGrounded && Input.GetKey(KeyCode.Q))  // air attack
+        {
+            if (curtime <= 0)
+            {
+                ani.SetBool("Air_Attack", true); // air attack 활성화 
+                curtime = cooltime; // 쿨타임 갱신
+            }
+        }
+      
         else
         {
+            ani.SetBool("Air_Attack", false);
             ani.SetBool("Attack", false); // Q를 떼면 공격 상태 종료
         }
 
