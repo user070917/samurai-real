@@ -52,7 +52,8 @@ public class Player : MonoBehaviour
                 curtime = cooltime; // 쿨타임 갱신
             }
         }
-        else if (ani.GetBool("IsJumping") && ani.GetBool("Attack"))  // air attack
+        //else if (ani.GetBool("IsJumping") && ani.GetBool("Attack"))  // air attack
+        else if (Input.GetKey(KeyCode.W))
         {
             if (curtime <= 0)
             {
@@ -61,9 +62,9 @@ public class Player : MonoBehaviour
             }
         }
       
-        else
+        else if (isGrounded)
         {
-            ani.SetBool("Air_Attack", false);
+            ani.SetBool("Air_Attack", false); // 땅에 닿거나 Q를 누르고 있지 않으면 상태 종료 
             ani.SetBool("Attack", false); // Q를 떼면 공격 상태 종료
         }
 
