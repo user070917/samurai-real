@@ -62,7 +62,7 @@ public class Player : MonoBehaviour
             }
         }
       
-        else if ()
+        else if (isGrounded)
         {
             ani.SetBool("Air_Attack", false); // 땅에 닿거나 Q를 누르고 있지 않으면 상태 종료 
             ani.SetBool("Attack", false); // Q를 떼면 공격 상태 종료
