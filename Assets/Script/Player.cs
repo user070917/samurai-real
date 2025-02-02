@@ -41,31 +41,29 @@ public class Player : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, jumpPower);
             jumpCount++;
             ani.SetBool("IsJumping", true);
+            isGrounded = false;
         }
 
         // 공격 처리
-        if (Input.GetKey(KeyCode.Q) && isGrounded) // Q가 눌려있으면 계속 공격
+        if (Input.GetKey(KeyCode.Q)) // Q 키를 누르면 공격 실행
         {
             if (curtime <= 0)
             {
-                ani.SetBool("Attack", true); // 공격 상태 유지
+                if (isGrounded)
+                {
+                    ani.SetBool("Attack", true); // 지상 공격
+                }
+                else
+                {
+                    ani.SetBool("Air_Attack", true); // 공중 공격
+                }
                 curtime = cooltime; // 쿨타임 갱신
             }
         }
-        //else if (ani.GetBool("IsJumping") && ani.GetBool("Attack"))  // air attack
-        else if (Input.GetKey(KeyCode.W))
+        else
         {
-            if (curtime <= 0)
-            {
-                ani.SetBool("Air_Attack", true); // air attack 활성화 
-                curtime = cooltime; // 쿨타임 갱신
-            }
-        }
-      
-        else if (isGrounded)
-        {
-            ani.SetBool("Air_Attack", false); // 땅에 닿거나 Q를 누르고 있지 않으면 상태 종료 
-            ani.SetBool("Attack", false); // Q를 떼면 공격 상태 종료
+            ani.SetBool("Attack", false);
+            ani.SetBool("Air_Attack", false); // 키를 떼면 공중 공격도 해제
         }
 
         if (curtime > 0)
@@ -105,9 +103,12 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // 땅에 닿았을 때 점프 카운트 초기화
-        isGrounded = true;
-        jumpCount = 0;
-        ani.SetBool("IsJumping", false);
+        if (collision.CompareTag("Ground"))
+        {
+            isGrounded = true;
+            jumpCount = 0;
+            ani.SetBool("IsJumping", false);
+            ani.SetBool("Air_Attack", false); // 바닥에 닿으면 공중 공격 해제
+        }
     }
 }
