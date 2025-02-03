@@ -16,6 +16,16 @@ public class Player : MonoBehaviour
     [SerializeField]
     int maxJumpCount = 2; // 최대 점프 횟수
     [SerializeField]
+    float dashSpeed = 10f;
+    [SerializeField]
+    float dashDuration = 0.2f; // 대쉬 지속 시간
+    [SerializeField]
+    float dashCooldown = 1f; // 대쉬 쿨타임
+
+    bool isDashing = false;
+    float dashTime = 0;
+    float dashCooldownTime = 0;
+
     float curtime;
     [SerializeField]
     float cooltime = 0.5f;
@@ -71,24 +81,56 @@ public class Player : MonoBehaviour
         {
             curtime -= Time.deltaTime; // 쿨타임 감소
         }
+
+
+        if (Input.GetKeyDown(KeyCode.R) && dashCooldownTime <= 0 && !isDashing)
+        {
+            isDashing = true;
+            dashTime = dashDuration;
+            dashCooldownTime = dashCooldown;
+            ani.SetBool("Dash", true);
+        }
+        //else
+        //{
+        //    ani.SetBool("Dash", false);
+        //}
     }
 
     private void FixedUpdate()
     {
-        float AdjustSpeed = moveSpeed;
-
-        if (ani.GetBool("Attack"))
+        if (isDashing)
         {
-            AdjustSpeed *= 0.3f;
-        }
-        if (ani.GetBool("IsJumping"))
-        {
-            AdjustSpeed *= 0.7f;
+            rb.velocity = new Vector2(facingRight ? dashSpeed : -dashSpeed, rb.velocity.y);
+            dashTime -= Time.fixedDeltaTime;
+            if (dashTime <= 0)
+            {
+                isDashing = false;
+                ani.SetBool("Dash", false);
+            }
         }
 
-        rb.velocity = new Vector2(horizontalInput * AdjustSpeed, rb.velocity.y);
-        ani.SetFloat("Xvelocity", Math.Abs(rb.velocity.x));
-        ani.SetFloat("Yvelocity", rb.velocity.y);
+        else
+        {
+            float AdjustSpeed = moveSpeed;
+
+            if (ani.GetBool("Attack"))
+            {
+                AdjustSpeed *= 0.3f;
+            }
+            if (ani.GetBool("IsJumping"))
+            {
+                AdjustSpeed *= 0.7f;
+            }
+            rb.velocity = new Vector2(horizontalInput * AdjustSpeed, rb.velocity.y);
+            ani.SetFloat("Xvelocity", Math.Abs(rb.velocity.x));
+            ani.SetFloat("Yvelocity", rb.velocity.y);
+
+        }
+        // 대쉬 쿨타임 감소
+        if (dashCooldownTime > 0)
+        {
+            dashCooldownTime -= Time.fixedDeltaTime;
+        }
     }
 
     void FlipSprite()
