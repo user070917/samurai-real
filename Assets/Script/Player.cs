@@ -19,6 +19,7 @@ public class Player : MonoBehaviour
     float curtime;
     [SerializeField]
     float cooltime = 0.5f;
+    int maxhp = 100; //최대 체력 
 
     Rigidbody2D rb;
     Animator ani;
