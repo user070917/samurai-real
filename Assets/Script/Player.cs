@@ -10,25 +10,31 @@ public class Player : MonoBehaviour
     float moveSpeed = 5f;
     bool facingRight = true;
     bool isGrounded = false;
+    bool isDashing = false;
+    bool isDefending = false;
     [SerializeField]
     float jumpPower = 5f;
     int jumpCount = 0; // 점프 횟수 추적
     [SerializeField]
     int maxJumpCount = 2; // 최대 점프 횟수
     [SerializeField]
-    float dashSpeed = 10f;
+    float dashSpeed = 10f; // 대쉬 속도 
     [SerializeField]
     float dashDuration = 0.2f; // 대쉬 지속 시간
     [SerializeField]
     float dashCooldown = 1f; // 대쉬 쿨타임
-
-    bool isDashing = false;
     float dashTime = 0;
     float dashCooldownTime = 0;
-
+    [SerializeField]
+    float defendCooldown = 1f; // 패링 쿨타임 (증가)
+    [SerializeField]
+    float defendDuration = 0.15f; // 패링 지속 시간
+    float defendCooldownTime = 0;
+    float defendTime = 0; // 변수명 수정
     float curtime;
     [SerializeField]
     float cooltime = 0.5f;
+    [SerializeField]
     int maxhp = 100; //최대 체력 
 
     Rigidbody2D rb;
@@ -56,33 +62,33 @@ public class Player : MonoBehaviour
         }
 
         // 공격 처리
-        if (Input.GetKey(KeyCode.Q)) // Q 키를 누르면 공격 실행
+        if (Input.GetKey(KeyCode.Q))
         {
             if (curtime <= 0)
             {
                 if (isGrounded)
                 {
-                    ani.SetBool("Attack", true); // 지상 공격
+                    ani.SetBool("Attack", true);
                 }
                 else
                 {
-                    ani.SetBool("Air_Attack", true); // 공중 공격
+                    ani.SetBool("Air_Attack", true);
                 }
-                curtime = cooltime; // 쿨타임 갱신
+                curtime = cooltime;
             }
         }
         else
         {
             ani.SetBool("Attack", false);
-            ani.SetBool("Air_Attack", false); // 키를 떼면 공중 공격도 해제
+            ani.SetBool("Air_Attack", false);
         }
 
         if (curtime > 0)
         {
-            curtime -= Time.deltaTime; // 쿨타임 감소
+            curtime -= Time.deltaTime;
         }
 
-
+        // 대쉬 처리
         if (Input.GetKeyDown(KeyCode.R) && dashCooldownTime <= 0 && !isDashing)
         {
             isDashing = true;
@@ -90,10 +96,15 @@ public class Player : MonoBehaviour
             dashCooldownTime = dashCooldown;
             ani.SetBool("Dash", true);
         }
-        //else
-        //{
-        //    ani.SetBool("Dash", false);
-        //}
+
+        // 패링(방어) 처리
+        if (Input.GetKeyDown(KeyCode.E) && defendCooldownTime <= 0 && !isDefending)
+        {
+            isDefending = true;
+            defendTime = defendDuration;
+            defendCooldownTime = defendCooldown;
+            ani.SetBool("Defend", true);
+        }
     }
 
     private void FixedUpdate()
@@ -108,7 +119,6 @@ public class Player : MonoBehaviour
                 ani.SetBool("Dash", false);
             }
         }
-
         else
         {
             float AdjustSpeed = moveSpeed;
@@ -124,12 +134,28 @@ public class Player : MonoBehaviour
             rb.velocity = new Vector2(horizontalInput * AdjustSpeed, rb.velocity.y);
             ani.SetFloat("Xvelocity", Math.Abs(rb.velocity.x));
             ani.SetFloat("Yvelocity", rb.velocity.y);
-
         }
+
         // 대쉬 쿨타임 감소
         if (dashCooldownTime > 0)
         {
             dashCooldownTime -= Time.fixedDeltaTime;
+        }
+
+        // 방어 지속 시간 및 쿨타임 처리
+        if (isDefending)
+        {
+            defendTime -= Time.fixedDeltaTime;
+            if (defendTime <= 0)
+            {
+                isDefending = false;
+                ani.SetBool("Defend", false);
+            }
+        }
+
+        if (defendCooldownTime > 0)
+        {
+            defendCooldownTime -= Time.fixedDeltaTime;
         }
     }
 
@@ -151,7 +177,7 @@ public class Player : MonoBehaviour
             isGrounded = true;
             jumpCount = 0;
             ani.SetBool("IsJumping", false);
-            ani.SetBool("Air_Attack", false); // 바닥에 닿으면 공중 공격 해제
+            ani.SetBool("Air_Attack", false);
         }
     }
 }
