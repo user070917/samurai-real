@@ -30,7 +30,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     float defendDuration = 0.15f; // 패링 지속 시간
     float defendCooldownTime = 0;
-    float defendTime = 0; // 변수명 수정
+    float defendTime = 0; 
     float curtime;
     [SerializeField]
     float cooltime = 0.5f;
@@ -89,7 +89,7 @@ public class Player : MonoBehaviour
         }
 
         // 대쉬 처리
-        if (Input.GetKeyDown(KeyCode.R) && dashCooldownTime <= 0 && !isDashing)
+        if (Input.GetKeyDown(KeyCode.R) && dashCooldownTime <= 0 && !isDashing && !isDefending)
         {
             isDashing = true;
             dashTime = dashDuration;
@@ -98,13 +98,15 @@ public class Player : MonoBehaviour
         }
 
         // 패링(방어) 처리
-        if (Input.GetKeyDown(KeyCode.E) && defendCooldownTime <= 0 && !isDefending)
+        if (Input.GetKeyDown(KeyCode.E) && defendCooldownTime <= 0 && !isDefending && !isDashing)
         {
             isDefending = true;
             defendTime = defendDuration;
             defendCooldownTime = defendCooldown;
             ani.SetBool("Defend", true);
         }
+
+       
     }
 
     private void FixedUpdate()
@@ -112,7 +114,7 @@ public class Player : MonoBehaviour
         if (isDashing)
         {
             rb.velocity = new Vector2(facingRight ? dashSpeed : -dashSpeed, rb.velocity.y);
-            dashTime -= Time.fixedDeltaTime;
+            dashTime -= Time.fixedDeltaTime; 
             if (dashTime <= 0)
             {
                 isDashing = false;
