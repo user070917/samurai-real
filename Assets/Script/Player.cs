@@ -1,7 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
 
 public class Player : MonoBehaviour
 {
@@ -34,11 +33,11 @@ public class Player : MonoBehaviour
     float curtime;
     [SerializeField]
     float cooltime = 0.5f;
-    [SerializeField]
-    int maxhp = 100; //최대 체력 
 
     Rigidbody2D rb;
     Animator ani;
+
+
 
     void Start()
     {
@@ -46,68 +45,20 @@ public class Player : MonoBehaviour
         ani = GetComponent<Animator>();
     }
 
+
+
     void Update()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
+        horizontalInput = Input.GetAxis("Horizontal"); // 좌우 이동 처리 
 
         FlipSprite();
-
-        // 점프 처리
-        if (Input.GetButtonDown("Jump") && jumpCount < maxJumpCount)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, jumpPower);
-            jumpCount++;
-            ani.SetBool("IsJumping", true);
-            isGrounded = false;
-        }
-
-        // 공격 처리
-        if (Input.GetKey(KeyCode.Q))
-        {
-            if (curtime <= 0)
-            {
-                if (isGrounded)
-                {
-                    ani.SetBool("Attack", true);
-                }
-                else
-                {
-                    ani.SetBool("Air_Attack", true);
-                }
-                curtime = cooltime;
-            }
-        }
-        else
-        {
-            ani.SetBool("Attack", false);
-            ani.SetBool("Air_Attack", false);
-        }
-
-        if (curtime > 0)
-        {
-            curtime -= Time.deltaTime;
-        }
-
-        // 대쉬 처리
-        if (Input.GetKeyDown(KeyCode.R) && dashCooldownTime <= 0 && !isDashing && !isDefending)
-        {
-            isDashing = true;
-            dashTime = dashDuration;
-            dashCooldownTime = dashCooldown;
-            ani.SetBool("Dash", true);
-        }
-
-        // 패링(방어) 처리
-        if (Input.GetKeyDown(KeyCode.E) && defendCooldownTime <= 0 && !isDefending && !isDashing)
-        {
-            isDefending = true;
-            defendTime = defendDuration;
-            defendCooldownTime = defendCooldown;
-            ani.SetBool("Defend", true);
-        }
-
-       
+        Jump();
+        Attack();
+        Dash();
+        Defend();  
     }
+
+
 
     private void FixedUpdate()
     {
@@ -158,6 +109,72 @@ public class Player : MonoBehaviour
         if (defendCooldownTime > 0)
         {
             defendCooldownTime -= Time.fixedDeltaTime;
+        }
+    }
+
+    void Attack() // 공격 & 공중 공격 처리
+    {
+        if (Input.GetKey(KeyCode.Q))
+        {
+            if (curtime <= 0)
+            {
+                if (isGrounded)
+                {
+                    ani.SetBool("Air_Attack", false);
+                    curtime = cooltime;
+                    ani.SetBool("Attack", true);
+                }
+                else
+                {
+                    ani.SetBool("Attack", false);
+                    curtime = cooltime;
+                    ani.SetBool("Air_Attack", true);
+                }
+                curtime = cooltime;
+            }
+        }
+        else
+        {
+            ani.SetBool("Attack", false);
+            ani.SetBool("Air_Attack", false);
+        }
+
+        if (curtime > 0)
+        {
+            curtime -= Time.deltaTime;
+        }
+    }
+
+    void Jump() // 점프 처리 
+    {
+        if (Input.GetButtonDown("Jump") && jumpCount < maxJumpCount)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpPower);
+            jumpCount++;
+            ani.SetBool("IsJumping", true);
+            isGrounded = false;
+        }
+    }
+
+    void Defend() // 패링 기능 처리 
+    {
+        if (Input.GetKeyDown(KeyCode.E) && defendCooldownTime <= 0 && !isDefending && !isDashing)
+        {
+            isDefending = true;
+            defendTime = defendDuration;
+            defendCooldownTime = defendCooldown;
+            ani.SetBool("Defend", true);
+        }
+    }
+
+    void Dash() // 대쉬 기능 처리 
+    {
+        if (Input.GetKeyDown(KeyCode.R) && dashCooldownTime <= 0 && !isDashing && !isDefending)
+        {
+            isDashing = true;
+            dashTime = dashDuration;
+            dashCooldownTime = dashCooldown;
+            ani.SetBool("Dash", true);
         }
     }
 
