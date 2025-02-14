@@ -11,6 +11,8 @@ public class Player : MonoBehaviour
     bool isGrounded = false;
     bool isDashing = false;
     bool isDefending = false;
+    bool isClimbing = false;
+
     [SerializeField]
     float jumpPower = 5f;
     int jumpCount = 0; // 점프 횟수 추적
@@ -29,7 +31,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     float defendDuration = 0.15f; // 패링 지속 시간
     float defendCooldownTime = 0;
-    float defendTime = 0; 
+    float defendTime = 0;
     float curtime;
     [SerializeField]
     float cooltime = 0.5f;
@@ -55,7 +57,7 @@ public class Player : MonoBehaviour
         Jump();
         Attack();
         Dash();
-        Defend();  
+        Defend();
     }
 
 
@@ -65,7 +67,7 @@ public class Player : MonoBehaviour
         if (isDashing)
         {
             rb.velocity = new Vector2(facingRight ? dashSpeed : -dashSpeed, rb.velocity.y);
-            dashTime -= Time.fixedDeltaTime; 
+            dashTime -= Time.fixedDeltaTime;
             if (dashTime <= 0)
             {
                 isDashing = false;
@@ -180,7 +182,7 @@ public class Player : MonoBehaviour
 
     void FlipSprite()
     {
-        if (facingRight && horizontalInput < 0f || !facingRight && horizontalInput > 0f)
+       if (facingRight && horizontalInput < 0f || !facingRight && horizontalInput > 0f)
         {
             facingRight = !facingRight;
             Vector3 ls = transform.localScale;
@@ -189,14 +191,34 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+
+
+
+
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.CompareTag("Ground"))
+        if (other.CompareTag("Ground"))
         {
             isGrounded = true;
             jumpCount = 0;
             ani.SetBool("IsJumping", false);
             ani.SetBool("Air_Attack", false);
         }
+        else if (other.CompareTag("Wall"))  // 벽 타기 기능 
+        {
+            ani.SetBool("IsJumping", false);
+            isClimbing = true;
+            ani.SetBool("WallClimb", true);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Wall"))
+        {
+            isClimbing = false;
+            ani.SetBool("WallClimb", false);
+        }
     }
 }
+
