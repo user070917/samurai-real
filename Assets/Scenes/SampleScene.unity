@@ -1144,7 +1144,7 @@ Transform:
   m_GameObject: {fileID: 816483451}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 15.1, y: -3.94, z: 0}
+  m_LocalPosition: {x: -5.15, y: -4.58, z: 0}
   m_LocalScale: {x: 1000, y: 8.7853, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1636,6 +1636,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 114d784f16209405c8aa80c578486511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  S_AttackForce: 20
   moveSpeed: 10
   jumpPower: 13
   maxJumpCount: 2
@@ -1644,7 +1645,7 @@ MonoBehaviour:
   dashCooldown: 0.8
   defendCooldown: 0.9
   defendDuration: 0.4
-  cooltime: 0.4
+  cooltime: 0.5
 --- !u!70 &894468555
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

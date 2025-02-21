@@ -5,37 +5,31 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     float horizontalInput;
-    [SerializeField]
-    float moveSpeed = 5f;
     bool facingRight = true;
     bool isGrounded = false;
     bool isDashing = false;
     bool isDefending = false;
-    bool isClimbing = false;
+    bool isS_Attack = false;
 
-    [SerializeField]
-    float jumpPower = 5f;
+    [SerializeField] float S_AttackForce = 20f; // 특수기 위로 뜨는 힘 
+    [SerializeField] float moveSpeed = 5f; // 이동 속도 
+    [SerializeField] float jumpPower = 5f; // 점프 힘 
+    [SerializeField] int maxJumpCount = 2; // 최대 점프 횟수
+    [SerializeField] float dashSpeed = 10f; // 대쉬 속도 
+    [SerializeField] float dashDuration = 0.2f; // 대쉬 지속 시간
+    [SerializeField] float dashCooldown = 1f; // 대쉬 쿨타임
+    [SerializeField] float defendCooldown = 1f; // 패링 쿨타임 (증가)
+    [SerializeField] float defendDuration = 0.15f; // 패링 지속 시간
+    [SerializeField] float cooltime = 0.5f; // 쿨타임 
+
     int jumpCount = 0; // 점프 횟수 추적
-    [SerializeField]
-    int maxJumpCount = 2; // 최대 점프 횟수
-    [SerializeField]
-    float dashSpeed = 10f; // 대쉬 속도 
-    [SerializeField]
-    float dashDuration = 0.2f; // 대쉬 지속 시간
-    [SerializeField]
-    float dashCooldown = 1f; // 대쉬 쿨타임
     float dashTime = 0;
     float dashCooldownTime = 0;
-    [SerializeField]
-    float defendCooldown = 1f; // 패링 쿨타임 (증가)
-    [SerializeField]
-    float defendDuration = 0.15f; // 패링 지속 시간
     float defendCooldownTime = 0;
     float defendTime = 0;
     float curtime;
-    [SerializeField]
-    float cooltime = 0.5f;
 
+    
     Rigidbody2D rb;
     Animator ani;
 
@@ -58,6 +52,8 @@ public class Player : MonoBehaviour
         Attack();
         Dash();
         Defend();
+        
+
     }
 
 
@@ -81,6 +77,10 @@ public class Player : MonoBehaviour
             if (ani.GetBool("Attack"))
             {
                 AdjustSpeed *= 0.3f;
+            }
+            if (ani.GetBool("S_Attack"))
+            {
+                rb.AddForce(Vector3.up * S_AttackForce, ForceMode2D.Impulse);
             }
             if (ani.GetBool("IsJumping"))
             {
@@ -112,6 +112,8 @@ public class Player : MonoBehaviour
         {
             defendCooldownTime -= Time.fixedDeltaTime;
         }
+
+       
     }
 
     void Attack() // 공격 & 공중 공격 처리
@@ -135,8 +137,15 @@ public class Player : MonoBehaviour
                 curtime = cooltime;
             }
         }
+
+        else if (Input.GetKeyDown(KeyCode.W)) // 특수 공격기 
+        {
+            ani.SetBool("S_Attack", true);
+        }
+
         else
         {
+            ani.SetBool("S_Attack", false);
             ani.SetBool("Attack", false);
             ani.SetBool("Air_Attack", false);
         }
@@ -180,9 +189,11 @@ public class Player : MonoBehaviour
         }
     }
 
+    
+
     void FlipSprite()
     {
-       if (facingRight && horizontalInput < 0f || !facingRight && horizontalInput > 0f)
+        if (facingRight && horizontalInput < 0f || !facingRight && horizontalInput > 0f)
         {
             facingRight = !facingRight;
             Vector3 ls = transform.localScale;
@@ -204,21 +215,5 @@ public class Player : MonoBehaviour
             ani.SetBool("IsJumping", false);
             ani.SetBool("Air_Attack", false);
         }
-        else if (other.CompareTag("Wall"))  // 벽 타기 기능 
-        {
-            ani.SetBool("IsJumping", false);
-            isClimbing = true;
-            ani.SetBool("WallClimb", true);
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("Wall"))
-        {
-            isClimbing = false;
-            ani.SetBool("WallClimb", false);
-        }
     }
 }
-
