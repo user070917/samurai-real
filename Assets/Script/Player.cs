@@ -80,6 +80,7 @@ public class Player : MonoBehaviour
             }
             if (ani.GetBool("S_Attack"))
             {
+                AdjustSpeed *= 0.3f;
                 rb.AddForce(Vector3.up * S_AttackForce, ForceMode2D.Impulse);
             }
             if (ani.GetBool("IsJumping"))
